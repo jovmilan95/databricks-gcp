@@ -15,7 +15,7 @@ jobs:
     environment: |-
       ${{ github.ref == 'refs/heads/main' && 'prod'
        || github.ref == 'refs/heads/dev'  && 'dev'
-       || github.ref == 'refs/heads/stg'  && 'stg'
+       ||                                    'stg'
       }}
     defaults:
       run:
