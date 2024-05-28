@@ -3,11 +3,11 @@ locals {
 }
 
 provider "google" {
-  project = "${var.project}"
+  project = var.project
 }
 
 module "pet" {
   source  = "../../modules/pet"
-  project = "${var.project}"
-  env     = "${local.env}"
+  project = var.project
+  env     = local.env
 }

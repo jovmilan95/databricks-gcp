@@ -1,3 +1,3 @@
 output "pet" {
-  value = "${module.pet.name}"
+  value = module.pet.name
 }
