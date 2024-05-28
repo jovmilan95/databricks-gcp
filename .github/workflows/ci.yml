@@ -10,7 +10,8 @@ env:
   GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
   TERRAFORM_VERSION: 1.7.5
 jobs:
-  deploy-dev:
+  dev:
+    if: github.ref_name == 'main'
     uses: ./.github/workflows/deploy_environment.yml
     with:
       environment: dev
