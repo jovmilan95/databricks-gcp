@@ -9,7 +9,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: "${{ inputs.environment }}"
+    environment: dev
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
