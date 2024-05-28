@@ -13,7 +13,10 @@ jobs:
   deploy-dev:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - uses: ./.github/workflows/deploy_environment.yml
         with:
           environment: dev
@@ -24,14 +27,14 @@ jobs:
       # - name: INFO
       #   run: |
       #    pwd
-      #    ls -alh 
+      #    ls -alh
       #    echo ${{ github.event.deployment.environment }}
       # - name: Set up Databricks CLI profile for Terraform provider
       #   run: |
       #     echo "[DEFAULT]" >> ~/.databrickscfg
       #     echo "host = $DATABRICKS_HOST" >> ~/.databrickscfg
       #     echo "token = $DATABRICKS_TOKEN" >> ~/.databrickscfg
-      # - name: Enter environment directory 
+      # - name: Enter environment directory
       #   run: cd terraform/environments/${{ github.event.deployment.environment }}
       # - name: Check formatting of Terraform code
       #   id: fmt
