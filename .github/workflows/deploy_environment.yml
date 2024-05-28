@@ -6,17 +6,54 @@ on:
       environment:
         required: true
         type: string
+      terraform_version:
+        required: true
+        type: string
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: dev
+    env: 
+      GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+    strategy:
+      max-parallel: 4
     defaults:
-      run: 
+      run:
         working-directory: terraform/environments/${{ inputs.environment }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: kdls
-        run: pwd
       
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2.0.0
+        with:
+          terraform_version: ${{ inputs.terraform_version }}
+      # - name: Set up Databricks CLI profile for Terraform provider
+      #   run: |
+      #     echo "[DEFAULT]" >> ~/.databrickscfg
+      #     echo "host = $DATABRICKS_HOST" >> ~/.databrickscfg
+      #     echo "token = $DATABRICKS_TOKEN" >> ~/.databrickscfg
+      - name: Check formatting of Terraform code
+        id: fmt
+        run: |
+          terraform fmt -check
+      - name: Terraform Init
+        id: init
+        run: terraform init
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -input=false
+        continue-on-error: true
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply -no-color -input=false --auto-approve
+        continue-on-error: true
+      - name: Terraform Apply Status
+        if: steps.apply.outcome == 'failure'
+        run: exit 1
