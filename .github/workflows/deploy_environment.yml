@@ -7,12 +7,6 @@ on:
         required: true
         type: string
 
-defaults:
-  run:
-    shell: bash
-    working-directory: "./terraform/environments/"
-
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -22,7 +16,7 @@ jobs:
         uses: actions/checkout@v2
       - name: DSKLSD
         run: |
-          cd ${{ inputs.environment }}
+          cd terraform/environments/${{ inputs.environment }}
           pwd
       - name: kdls
         run: pwd
