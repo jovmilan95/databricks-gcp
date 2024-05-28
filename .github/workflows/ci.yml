@@ -11,17 +11,9 @@ env:
   TERRAFORM_VERSION: 1.7.5
 jobs:
   deploy-dev:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v3
-      - name: Test
-        run: ls -alh
-      # - name: wf list
-      #   run: ls -alh .github/workflows
-      # - uses: ./.github/workflows/deploy_environment.yml
-      #   with:
-      #     environment: dev
+    uses: ./.github/workflows/deploy_environment.yml
+    with:
+      environment: dev
       # - name: Install Terraform
       #   uses: hashicorp/setup-terraform@v2.0.0
       #   with:
