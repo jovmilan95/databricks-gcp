@@ -1,0 +1,18 @@
+name: Deploy to Environment
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: "${{ inputs.environment }}"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Print
+        run: echo "${{ secrets.GOOGLE_CREDENTIALS }}"

@@ -10,27 +10,22 @@ env:
   GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
   TERRAFORM_VERSION: 1.7.5
 jobs:
-  deploy:
+  deploy-dev:
     runs-on: ubuntu-latest
-    environment: |-
-      ${{ github.ref == 'refs/heads/main' && 'prod'
-       || github.ref == 'refs/heads/dev'  && 'dev'
-       ||                                    'stg'
-      }}
-    defaults:
-      run:
-        working-directory: terraform/environments/${{ github.event.deployment.environment }}
     steps:
       - uses: actions/checkout@v3
-      - name: Install Terraform
-        uses: hashicorp/setup-terraform@v2.0.0
+      - uses: ./.github/workflows/deploy_environment.yml@main
         with:
-          terraform_version: $TERRAFORM_VERSION
-      - name: INFO
-        run: |
-         pwd
-         ls -alh 
-         echo ${{ github.event.deployment.environment }}
+          environment: dev
+      # - name: Install Terraform
+      #   uses: hashicorp/setup-terraform@v2.0.0
+      #   with:
+      #     terraform_version: $TERRAFORM_VERSION
+      # - name: INFO
+      #   run: |
+      #    pwd
+      #    ls -alh 
+      #    echo ${{ github.event.deployment.environment }}
       # - name: Set up Databricks CLI profile for Terraform provider
       #   run: |
       #     echo "[DEFAULT]" >> ~/.databrickscfg
