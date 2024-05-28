@@ -21,7 +21,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: DSKLSD
-        run: cd ${{ inputs.environment }}
+        run: |
+          cd ${{ inputs.environment }}
+          pwd
       - name: kdls
         run: pwd
       
