@@ -17,7 +17,11 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - uses: ./.github/workflows/deploy_environment.yml
+      - name: Test
+        run: ls -alh
+      - name: wf list
+        run: ls -alh .github/workflows
+      - uses: .github/workflows/deploy_environment.yml
         with:
           environment: dev
       # - name: Install Terraform
