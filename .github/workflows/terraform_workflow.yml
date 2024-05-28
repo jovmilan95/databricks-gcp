@@ -1,0 +1,32 @@
+---
+name: Terraform Workflow
+on:
+  push:
+    branches: [main, dev, stg]
+env:
+  TERRAFORM_VERSION: 1.8.4
+
+jobs:
+  dev:
+    if: github.ref_name == 'dev'
+    uses: ./.github/workflows/terraform_provision_environment.yml
+    with:
+      environment: dev
+      terraform_version: ${{ vars.TERRAFORM_VERSION }}
+    secrets: inherit
+
+  stg:
+    if: github.ref_name == 'stg'
+    uses: ./.github/workflows/terraform_provision_environment.yml
+    with:
+      environment: stg
+      terraform_version: ${{ vars.TERRAFORM_VERSION }}
+    secrets: inherit
+
+  prod:
+    if: github.ref_name == 'main'
+    uses: ./.github/workflows/terraform_provision_environment.yml
+    with:
+      environment: prod
+      terraform_version: ${{ vars.TERRAFORM_VERSION }}
+    secrets: inherit
