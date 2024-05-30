@@ -8,7 +8,7 @@ env:
 
 jobs:
   dev:
-    if: github.ref_name == 'dev'
+    if: github.ref == 'refs/heads/dev' && (github.event_name == 'pull_request' || github.event_name == 'push')
     uses: ./.github/workflows/terraform_provision_environment.yml
     with:
       environment: dev
@@ -16,7 +16,7 @@ jobs:
     secrets: inherit
 
   stg:
-    if: github.ref_name == 'stg'
+    if: github.ref == 'refs/heads/stg' && (github.event_name == 'pull_request' || github.event_name == 'push')
     uses: ./.github/workflows/terraform_provision_environment.yml
     with:
       environment: stg
@@ -24,7 +24,7 @@ jobs:
     secrets: inherit
 
   prod:
-    if: github.ref_name == 'main'
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'pull_request' || github.event_name == 'push')
     uses: ./.github/workflows/terraform_provision_environment.yml
     with:
       environment: prod
