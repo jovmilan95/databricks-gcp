@@ -25,6 +25,8 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
+    env:
+      GOOGLE_BACKEND_CREDENTIALS: ${{ secrets.GOOGLE_BACKEND_CREDENTIALS }}
     defaults:
       run:
         working-directory: terraform/environments/${{ inputs.environment }}
@@ -46,7 +48,7 @@ jobs:
           terraform init \
           -backend-config="bucket=${{ secrets.TF_BACKEND_BUCKET}}" \
           -backend-config="previx=env/${{ inputs.environment }}" \
-          -backend-config="credentials=${{ secrets.GOOGLE_BACKEND_CREDENTIALS }}"
+          -backend-config="credentials=$GOOGLE_BACKEND_CREDENTIALS"
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
@@ -113,7 +115,7 @@ jobs:
           terraform init \
           -backend-config="bucket=${{ secrets.TF_BACKEND_BUCKET}}" \
           -backend-config="previx=env/${{ inputs.environment }}" \
-          -backend-config="credentials=${{ secrets.GOOGLE_BACKEND_CREDENTIALS }}"
+          -backend-config="credentials=$GOOGLE_BACKEND_CREDENTIALS"
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
