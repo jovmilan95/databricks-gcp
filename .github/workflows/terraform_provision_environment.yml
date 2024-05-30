@@ -1,10 +1,10 @@
 ---
 name: Terraform Provision Environment
 
-# The required environment variables are:
+# The required secrets:
 # - DATABRICKS_HOST: URL for connecting to the Databricks instance
 # - DATABRICKS_TOKEN: API token for authenticating with the Databricks instance
-# - GOOGLE_BACKEND_CREDENTIALS: JSON credentials for authenticating with Google backend services
+# - TF_BACKEND_CREDENTIALS: JSON credentials for authenticating with Google backend services
 # - TF_BACKEND_BUCKET: Name of the bucket used as the Terraform backend to store state files.
 
 on:
@@ -26,7 +26,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     env:
-      GOOGLE_BACKEND_CREDENTIALS: ${{ secrets.GOOGLE_BACKEND_CREDENTIALS }}
+      TF_BACKEND_CREDENTIALS: ${{ secrets.TF_BACKEND_CREDENTIALS }}
+      TF_BACKEND_BUCKET: ${{ secrets.TF_BACKEND_BUCKET }}
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
     defaults:
       run:
         working-directory: terraform/environments/${{ inputs.environment }}
@@ -37,7 +40,12 @@ jobs:
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v2.0.0
         with:
-          terraform_version: $TERRAFORM_VERSION
+          terraform_version: ${{ inputs.terraform_version }}
+      - name: Set up Databricks CLI profile for Terraform provider
+        run: |
+          echo "[DEFAULT]" >> ~/.databrickscfg
+          echo "host = $DATABRICKS_HOST" >> ~/.databrickscfg
+          echo "token = $DATABRICKS_TOKEN" >> ~/.databrickscfg
       - name: Check formatting of Terraform code
         id: fmt
         run: |
@@ -46,9 +54,9 @@ jobs:
         id: init
         run: |
           terraform init \
-          -backend-config="bucket=${{ secrets.TF_BACKEND_BUCKET}}" \
+          -backend-config="bucket=$TF_BACKEND_BUCKET" \
           -backend-config="previx=env/${{ inputs.environment }}" \
-          -backend-config="credentials=$GOOGLE_BACKEND_CREDENTIALS"
+          -backend-config="credentials=$TF_BACKEND_CREDENTIALS"
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
@@ -88,7 +96,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     env:
-      GOOGLE_BACKEND_CREDENTIALS: ${{ secrets.GOOGLE_BACKEND_CREDENTIALS }}
+      TF_BACKEND_CREDENTIALS: ${{ secrets.TF_BACKEND_CREDENTIALS }}
+      TF_BACKEND_BUCKET: ${{ secrets.TF_BACKEND_BUCKET }}
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
     strategy:
       max-parallel: 4
     defaults:
@@ -103,8 +114,8 @@ jobs:
       - name: Set up Databricks CLI profile for Terraform provider
         run: |
           echo "[DEFAULT]" >> ~/.databrickscfg
-          echo "host = ${{ secrets.DATABRICKS_HOST }}" >> ~/.databrickscfg
-          echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ~/.databrickscfg
+          echo "host = $DATABRICKS_HOST" >> ~/.databrickscfg
+          echo "token = $DATABRICKS_TOKEN" >> ~/.databrickscfg
       - name: Check formatting of Terraform code
         id: fmt
         run: |
@@ -113,9 +124,9 @@ jobs:
         id: init
         run: |
           terraform init \
-          -backend-config="bucket=${{ secrets.TF_BACKEND_BUCKET}}" \
+          -backend-config="bucket=$TF_BACKEND_BUCKET" \
           -backend-config="previx=env/${{ inputs.environment }}" \
-          -backend-config="credentials=$GOOGLE_BACKEND_CREDENTIALS"
+          -backend-config="credentials=$TF_BACKEND_CREDENTIALS"
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
