@@ -3,6 +3,8 @@ name: Terraform Workflow
 on:
   push:
     branches: [main, dev, stg]
+  pull_request:
+    branches: [main, dev, stg]
 env:
   TERRAFORM_VERSION: 1.8.4
 
