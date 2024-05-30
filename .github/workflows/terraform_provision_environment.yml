@@ -79,6 +79,7 @@ jobs:
         run: exit 1
 
   provision:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     env:
