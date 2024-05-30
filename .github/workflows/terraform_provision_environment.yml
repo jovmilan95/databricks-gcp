@@ -19,17 +19,17 @@ on:
         required: true
         type: string
         description: "Specifies the version of Terraform to be used for provisioning infrastructure."
-
+env:
+  TF_BACKEND_CREDENTIALS: ${{ secrets.TF_BACKEND_CREDENTIALS }}
+  TF_BACKEND_BUCKET: ${{ secrets.TF_BACKEND_BUCKET }}
+  DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+  DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+  TEST_VAR: ${{ secrets.TEST_VAR }}
 jobs:
   build:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
-    env:
-      TF_BACKEND_CREDENTIALS: ${{ secrets.TF_BACKEND_CREDENTIALS }}
-      TF_BACKEND_BUCKET: ${{ secrets.TF_BACKEND_BUCKET }}
-      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
     defaults:
       run:
         working-directory: terraform/environments/${{ inputs.environment }}
@@ -55,7 +55,7 @@ jobs:
         run: |
           terraform init \
           -backend-config="bucket=$TF_BACKEND_BUCKET" \
-          -backend-config="previx=env/${{ inputs.environment }}" \
+          -backend-config="previx=env/$TEST_VAR/${{ inputs.environment }}" \
           -backend-config="credentials=$TF_BACKEND_CREDENTIALS"
       - name: Terraform Validate
         id: validate
@@ -95,11 +95,6 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
-    env:
-      TF_BACKEND_CREDENTIALS: ${{ secrets.TF_BACKEND_CREDENTIALS }}
-      TF_BACKEND_BUCKET: ${{ secrets.TF_BACKEND_BUCKET }}
-      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
     strategy:
       max-parallel: 4
     defaults:
@@ -125,7 +120,7 @@ jobs:
         run: |
           terraform init \
           -backend-config="bucket=$TF_BACKEND_BUCKET" \
-          -backend-config="previx=env/${{ inputs.environment }}" \
+          -backend-config="previx=env/$TEST_VAR/${{ inputs.environment }}" \
           -backend-config="credentials=$TF_BACKEND_CREDENTIALS"
       - name: Terraform Validate
         id: validate
