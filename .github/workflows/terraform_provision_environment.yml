@@ -11,13 +11,8 @@ on:
     inputs:
       environment:
         required: true
-        type: choice
+        type: string
         description: "Specifies the environment for provisioning infrastructure. Accepted values are 'prod', 'dev' or 'stg'."
-        options:
-          - dev
-          - stg
-          - prod
-
 
       terraform_version:
         required: true
