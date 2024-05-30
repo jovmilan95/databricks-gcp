@@ -21,5 +21,5 @@ resource "databricks_notebook" "this" {
 }
 
 output "notebook_url" {
- value = databricks_notebook.this.url
+  value = databricks_notebook.this.url
 }
