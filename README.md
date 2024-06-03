@@ -8,7 +8,7 @@
 **Prerequisites:**
 1. **Create a Service Account for Terraform:**
    - Create a Service Account for Terraform.
-   - Set the JSON content of this Service Account to the `GOOGLE_CREDENTIALS` secret variable.
+   - Set the JSON content of this Service Account to the `GOOGLE_APPLICATION_CREDENTIALS` secret variable.
    - Ensure this Service Account has an editor role and the ability to store data in the remote state bucket.
 
 1. **Create Users for Workspace Administration:**
@@ -23,4 +23,3 @@
 
 4. **Change Bucket Name in GitHub Action:**
    - Replace the bucket name used for remote in the GitHub Actions.
-   
