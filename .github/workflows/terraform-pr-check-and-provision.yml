@@ -105,7 +105,7 @@ jobs:
         id: init
         run: |
           terraform init \
-          -backend-config="bucket=databricks-alex-tfstate1" \
+          -backend-config="bucket=${{ inputs.terraform_backend_name }}" \
           -backend-config="prefix=env/${{ inputs.environment }}" 
       - name: Terraform Validate
         id: validate

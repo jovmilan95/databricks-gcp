@@ -5,9 +5,9 @@ on:
     branches: [main, dev, stg]
   pull_request:
     branches: [main, dev, stg]
-env:
-  TERRAFORM_VERSION: 1.8.4
-  TERRAFORM_BACKEND_NAME: "databricks-alex-tfstate1"
+# variables:
+#   TERRAFORM_VERSION: 1.8.4
+#   TERRAFORM_BACKEND_NAME: "databricks-alex-tfstate1"
 
 jobs:
   dev:
@@ -15,8 +15,8 @@ jobs:
     uses: ./.github/workflows/terraform-pr-check-and-provision.yml
     with:
       environment: dev
-      terraform_version: ${{ vars.TERRAFORM_VERSION }}
-      terraform_backend_name: ${{ vars.TERRAFORM_BACKEND_NAME }}
+      terraform_version: "1.8.4"
+      terraform_backend_name: "databricks-alex-tfstate1"
     secrets: inherit
 
   stg:
@@ -24,8 +24,8 @@ jobs:
     uses: ./.github/workflows/terraform-pr-check-and-provision.yml
     with:
       environment: stg
-      terraform_version: ${{ vars.TERRAFORM_VERSION }}
-      terraform_backend_name: ${{ vars.TERRAFORM_BACKEND_NAME }}
+      terraform_version: "1.8.4"
+      terraform_backend_name: "databricks-alex-tfstate1"
     secrets: inherit
 
   prod:
@@ -33,6 +33,6 @@ jobs:
     uses: ./.github/workflows/terraform-pr-check-and-provision.yml
     with:
       environment: prod
-      terraform_version: ${{ vars.TERRAFORM_VERSION }}
-      terraform_backend_name: ${{ vars.TERRAFORM_BACKEND_NAME }}
+      terraform_version: "1.8.4"
+      terraform_backend_name: "databricks-alex-tfstate1"
     secrets: inherit
