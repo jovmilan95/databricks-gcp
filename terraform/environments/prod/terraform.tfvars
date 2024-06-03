@@ -1,4 +1,4 @@
-prefix                          = "prod1"
+prefix                          = "prod12"
 google_project                  = "genuine-box-424516-p1"
 databricks_account_id           = "3889e6a7-4f3a-4ab7-8970-a8686fbb2396"
 workspace_name                  = "Production1"
