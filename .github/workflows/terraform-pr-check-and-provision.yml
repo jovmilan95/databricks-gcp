@@ -1,0 +1,127 @@
+---
+name: Terraform PR Check And Provision
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+        description: "Specifies the environment for provisioning infrastructure. Accepted values are 'prod', 'dev' or 'stg'."
+      terraform_backend_name:
+        required: true
+        type: string
+        description: "Name of the Terraform backend to be used"
+      terraform_version:
+        required: true
+        type: string
+        description: "Specifies the version of Terraform to be used for provisioning infrastructure."
+env:
+  GOOGLE_APPLICATION_CREDENTIALS: "/tmp/google-credentials.json"
+jobs:
+  build:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    defaults:
+      run:
+        working-directory: terraform/environments/${{ inputs.environment }}
+    strategy:
+      max-parallel: 4
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2.0.0
+        with:
+          terraform_version: ${{ inputs.terraform_version }}
+      - name: Check formatting of Terraform code
+        id: fmt
+        run: |
+          terraform fmt -check
+      - name: Configure Google Cloud SDK
+        run: echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > /tmp/google-credentials.json
+      - name: Terraform Init
+        id: init
+        run: |
+          terraform init \
+          -backend-config="bucket=${{ inputs.terraform_backend_name }}" \
+          -backend-config="prefix=env/${{ inputs.environment }}"
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -input=false
+        continue-on-error: true
+      - name: Update Pull Request
+        uses: actions/github-script@v6.1.0
+        env:
+          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+            <details><summary>Show Plan</summary>
+            \`\`\`\n
+            ${process.env.PLAN}
+            \`\`\`
+            </details>
+            *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+  provision:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    strategy:
+      max-parallel: 4
+    defaults:
+      run:
+        working-directory: terraform/environments/${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2.0.0
+        with:
+          terraform_version: ${{ inputs.terraform_version }}
+      - name: Check formatting of Terraform code
+        id: fmt
+        run: |
+          terraform fmt -check
+      - name: Configure Google Cloud SDK
+        run: echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > /tmp/google-credentials.json
+      - name: Terraform Init
+        id: init
+        run: |
+          terraform init \
+          -backend-config="bucket=databricks-alex-tfstate1" \
+          -backend-config="prefix=env/${{ inputs.environment }}" 
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -input=false
+        continue-on-error: true
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply -no-color -input=false --auto-approve
+        continue-on-error: true
+      - name: Terraform Apply Status
+        if: steps.apply.outcome == 'failure'
+        run: exit 1
+

@@ -1,6 +1,5 @@
-terraform {
-  backend "gcs" {
-    bucket = "databricks-alex-tfstate"
-    prefix = "env/prod"
-  }
-}
+# terraform {
+#   backend "gcs" {
+
+#   }
+# }

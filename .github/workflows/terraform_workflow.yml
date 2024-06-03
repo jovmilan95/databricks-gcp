@@ -1,0 +1,38 @@
+---
+name: Terraform Workflow
+on:
+  push:
+    branches: [main, dev, stg]
+  pull_request:
+    branches: [main, dev, stg]
+env:
+  TERRAFORM_VERSION: 1.8.4
+  TERRAFORM_BACKEND_NAME: "databricks-alex-tfstate1"
+
+jobs:
+  dev:
+    if: github.ref == 'refs/heads/dev' || (github.base_ref == 'dev' && github.event_name == 'pull_request')
+    uses: ./.github/workflows/terraform-pr-check-and-provision.yml
+    with:
+      environment: dev
+      terraform_version: ${{ vars.TERRAFORM_VERSION }}
+      terraform_backend_name: ${{ vars.TERRAFORM_BACKEND_NAME }}
+    secrets: inherit
+
+  stg:
+    if: github.ref == 'refs/heads/stg' || (github.base_ref == 'stg' && github.event_name == 'pull_request')
+    uses: ./.github/workflows/terraform-pr-check-and-provision.yml
+    with:
+      environment: stg
+      terraform_version: ${{ vars.TERRAFORM_VERSION }}
+      terraform_backend_name: ${{ vars.TERRAFORM_BACKEND_NAME }}
+    secrets: inherit
+
+  prod:
+    if: github.ref == 'refs/heads/main' || (github.base_ref == 'main' && github.event_name == 'pull_request')
+    uses: ./.github/workflows/terraform-pr-check-and-provision.yml
+    with:
+      environment: prod
+      terraform_version: ${{ vars.TERRAFORM_VERSION }}
+      terraform_backend_name: ${{ vars.TERRAFORM_BACKEND_NAME }}
+    secrets: inherit
