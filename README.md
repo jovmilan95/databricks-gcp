@@ -17,9 +17,5 @@
    - Assign admin privileges to these users.
    - Note: The prefix is defined in `terraform/environment/<env_name>/terraform.tfvars`.
 
-1. **Update Delegate From Variable in GitHub Actions:**
-
-    - Replace the delegate_from variable in the file `terraform/environment/<env_name>/terraform.tfvars` to point to the service account used in GitHub Actions.
-
-4. **Change Bucket Name in GitHub Action:**
+1. **Change Bucket Name in GitHub Action:**
    - Replace the bucket name used for remote in the GitHub Actions.
