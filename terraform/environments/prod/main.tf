@@ -36,52 +36,58 @@ provider "databricks" {
   token = module.workspace.databricks_token
 }
 
-# module "notebook" {
-#   # Commented out for_each block as it's not currently being used
-#   # for_each = local.notebook_files
-#   # notebook_path         = "${local.notebooks_directory}/${each.value}"
-#   source                = "../../modules/notebook"
-#   notebook_subdirectory = var.notebook_subdirectory
-#   notebook_path         = "${local.notebooks_directory}/notebook-getting-started.py"
-#   notebook_language     = "PYTHON"
-#   depends_on            = [module.workspace]
-#   providers = {
-#     databricks = databricks.workspace
-#   }
-# }
-
-# module "workspace_admin_privileges" {
-#   for_each   = var.workspace_admin_privileges
-#   source     = "../../modules/workspace_admin_privileges"
-#   user_name  = each.value
-#   depends_on = [module.workspace]
-#   providers = {
-#     databricks = databricks.workspace
-#   }
-# }
+resource "time_sleep" "wait_180_seconds" {
+  create_duration = "180s"
+  depends_on      = [module.workspace]
+}
 
 
-# module "cluster" {
-#   source                          = "../../modules/cluster"
-#   cluster_name                    = var.cluster_name
-#   cluster_autotermination_minutes = var.cluster_autotermination_minutes
-#   cluster_num_workers             = var.cluster_num_workers
-#   depends_on                      = [module.workspace]
-#   providers = {
-#     databricks = databricks.workspace
-#   }
-# }
+module "notebook" {
+  # Commented out for_each block as it's not currently being used
+  # for_each = local.notebook_files
+  # notebook_path         = "${local.notebooks_directory}/${each.value}"
+  source                = "../../modules/notebook"
+  notebook_subdirectory = var.notebook_subdirectory
+  notebook_path         = "${local.notebooks_directory}/notebook-getting-started.py"
+  notebook_language     = "PYTHON"
+  depends_on            = [module.workspace]
+  providers = {
+    databricks = databricks.workspace
+  }
+}
 
-# module "job" {
-#   source                         = "../../modules/job"
-#   job_name                       = "Getting Started [JOB]"
-#   task_key                       = "Getting Started [TASK]"
-#   email_notifications_on_failure = var.email_notifications_on_failure
-#   email_notifications_on_success = var.email_notifications_on_success
-#   existing_cluster_id            = module.cluster.cluster_id
-#   notebook_path                  = module.notebook.notebook_url
-#   providers = {
-#     databricks = databricks.workspace
-#   }
-# }
+module "workspace_admin_privileges" {
+  for_each   = var.workspace_admin_privileges
+  source     = "../../modules/workspace_admin_privileges"
+  user_name  = each.value
+  depends_on = [module.workspace]
+  providers = {
+    databricks = databricks.workspace
+  }
+}
+
+
+module "cluster" {
+  source                          = "../../modules/cluster"
+  cluster_name                    = var.cluster_name
+  cluster_autotermination_minutes = var.cluster_autotermination_minutes
+  cluster_num_workers             = var.cluster_num_workers
+  depends_on = [time_sleep.wait_180_seconds]
+  providers = {
+    databricks = databricks.workspace
+  }
+}
+
+module "job" {
+  source                         = "../../modules/job"
+  job_name                       = "getting-started-job"
+  task_key                       = "getting-started-task"
+  email_notifications_on_failure = var.email_notifications_on_failure
+  email_notifications_on_success = var.email_notifications_on_success
+  existing_cluster_id            = module.cluster.cluster_id
+  notebook_path                  = "/${module.notebook.notebook_url}"
+  providers = {
+    databricks = databricks.workspace
+  }
+}
 
