@@ -17,6 +17,9 @@ on:
         type: string
         description: "Specifies the version of Terraform to be used for provisioning infrastructure."
 
+concurrency:
+  group: ${{ inputs.environment }}
+
 defaults:
   run:
     working-directory: terraform
