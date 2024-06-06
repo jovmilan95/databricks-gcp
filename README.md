@@ -1,8 +1,5 @@
 # databricks-gcp
 
-**About the Project:**
-- The project has 3 Terraform environments, each mapped to a new path `env/env_name` in the GCP bucket.
-
 **Steps to Start the Project:**
 
 **Prerequisites:**
@@ -15,7 +12,7 @@
    - Visit [Databricks GCP Console](https://accounts.gcp.databricks.com/users).
    - Manually create 3 users for each environment with email addresses in the format `<prefix>-workspace-admin@<project-id>.iam.gserviceaccount.com`.
    - Assign admin privileges to these users.
-   - Note: The prefix is defined in `terraform/environment/<env_name>/terraform.tfvars`.
+   - Note: The prefix is defined in `terraform/env/<env_name>.tfvars`.
 
 1. **Change Bucket Name in GitHub Action:**
    - Replace the bucket name used for remote in the GitHub Actions.

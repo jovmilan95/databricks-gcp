@@ -47,7 +47,7 @@ jobs:
         run: |
           terraform init \
           -backend-config="bucket=${{ inputs.terraform_backend_name }}" \
-          -backend-config="prefix=terraform_backend"
+          -backend-config="prefix=terraform_state"
       - name: Select or Create Workspace
         run: |
           terraform workspace select ${{ inputs.environment }} || terraform workspace new ${{ inputs.environment }}
