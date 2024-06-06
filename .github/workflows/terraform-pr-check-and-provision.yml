@@ -16,6 +16,11 @@ on:
         required: true
         type: string
         description: "Specifies the version of Terraform to be used for provisioning infrastructure."
+
+defaults:
+  run:
+    working-directory: terraform
+
 env:
   GOOGLE_APPLICATION_CREDENTIALS: "/tmp/google-credentials.json"
 jobs:
@@ -23,9 +28,6 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
-    defaults:
-      run:
-        working-directory: terraform/environments/${{ inputs.environment }}
     strategy:
       max-parallel: 4
     steps:
@@ -45,7 +47,10 @@ jobs:
         run: |
           terraform init \
           -backend-config="bucket=${{ inputs.terraform_backend_name }}" \
-          -backend-config="prefix=env/${{ inputs.environment }}"
+          -backend-config="prefix=terraform_backend"
+      - name: Select or Create Workspace
+        run: |
+          terraform workspace select ${{ inputs.environment }} || terraform workspace new ${{ inputs.environment }}
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
@@ -86,9 +91,6 @@ jobs:
     environment: ${{ inputs.environment }}
     strategy:
       max-parallel: 4
-    defaults:
-      run:
-        working-directory: terraform/environments/${{ inputs.environment }}
     steps:
       - uses: actions/checkout@v3
       - name: Install Terraform
@@ -106,7 +108,10 @@ jobs:
         run: |
           terraform init \
           -backend-config="bucket=${{ inputs.terraform_backend_name }}" \
-          -backend-config="prefix=env/${{ inputs.environment }}" 
+          -backend-config="prefix=terraform_state"
+      - name: Select or Create Workspace
+        run: |
+          terraform workspace select ${{ inputs.environment }} || terraform workspace new ${{ inputs.environment }}
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
@@ -124,4 +129,3 @@ jobs:
       - name: Terraform Apply Status
         if: steps.apply.outcome == 'failure'
         run: exit 1
-
