@@ -117,7 +117,7 @@ jobs:
         run: terraform validate -no-color
       - name: Terraform Plan
         id: plan
-        run: terraform plan -no-color -input=false
+        run: terraform plan -no-color -input=false -var-file="env/${{ inputs.environment }}.tfvars"
         continue-on-error: true
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
